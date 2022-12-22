@@ -4,6 +4,8 @@ import time
 import os
 import badger_os
 import base64
+import hashlib
+import binascii
 from totp import totp
 from machine import Pin
 
@@ -67,13 +69,19 @@ while True:
 
         print(pin_string)
         
-        secret_and_pin_encoded = base64.b32encode(bytearray(secret + pin_string, 'ascii')).decode('utf-8')
+        s_and_p = secret + pin_string
         
-        print(secret_and_pin_encoded)
+        print(s_and_p)
         
-        print(base64.b32decode(secret_and_pin_encoded).decode('utf-8'))
-
-        one_time_password = totp(time.time(), secret_and_pin_encoded, step_secs=30, digits=6)
+        secret_and_pin_hashed = binascii.hexlify(hashlib.sha256(str(secret + pin_string).encode()).digest())
+        
+        print(secret_and_pin_hashed)
+        
+        secret_and_pin_hashed_and_encoded = base64.b32encode(secret_and_pin_hashed).decode('utf-8')
+        
+        print(secret_and_pin_hashed_and_encoded)
+        
+        one_time_password = totp(time.time(), secret_and_pin_hashed_and_encoded, step_secs=30, digits=8)
         
         print(one_time_password)
 
