@@ -7,7 +7,6 @@ import base64
 from totp import totp
 from machine import Pin
 
-#Base32 secret
 secret = 'secret'
 pin_string = ''
 
@@ -35,12 +34,6 @@ button_c.irq(trigger=Pin.IRQ_FALLING, handler=c_button_callback)
 
 display = badger2040.Badger2040()
 
-code = qrcode.QRCode()
-
-state = {
-    "current_qr": 0
-}
-
 def measure_qr_code(size, code):
     w, h = code.get_size()
     module_size = int(size / w)
@@ -62,27 +55,6 @@ changed = not badger2040.woken_by_button()
 
 
 while True:
-#     if TOTAL_CODES > 1:
-#         if display.pressed(badger2040.BUTTON_UP):
-#             if state["current_qr"] > 0:
-#                 state["current_qr"] -= 1
-#                 changed = True
-# 
-#         if display.pressed(badger2040.BUTTON_DOWN):
-#             if state["current_qr"] < TOTAL_CODES - 1:
-#                 state["current_qr"] += 1
-#                 changed = True
-
-#     if display.pressed(badger2040.BUTTON_B) or display.pressed(badger2040.BUTTON_C):
-#         display.pen(15)
-#         display.clear()
-#         badger_os.warning(display, "To add QR codes, connect Badger2040 to a PC, load up Thonny, and see qrgen.py.")
-#         time.sleep(4)
-#         changed = True
-
-#     if display.pressed(badger2040.BUTTON_A):
-#         pin_string += "a"
-#         time.sleep_ms(250)
         
     if display.pressed(badger2040.BUTTON_UP): 
         pin_string = ''
@@ -100,12 +72,6 @@ while True:
         print(secret_and_pin_encoded)
         
         print(base64.b32decode(secret_and_pin_encoded).decode('utf-8'))
-
-        
-#         secret_and_pin = str(secret + pin_string).encode('ascii')
-#         print(secret_and_pin)
-#         secret_and_pin_encoded = base32_encode(secret_and_pin)
-#         print(secret_and_pin_encoded)
 
         one_time_password = totp(time.time(), secret_and_pin_encoded, step_secs=30, digits=6)
         
